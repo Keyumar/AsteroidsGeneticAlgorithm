@@ -42,12 +42,14 @@ def main():
     ship = pygame.image.load("player.png")
     ship = pygame.transform.rotate(ship, -90)
 
+    timer =  pygame.time.Clock()
+
     run = True
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-        
+
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             player.rotation += 15
@@ -64,7 +66,7 @@ def main():
         ycomp = math.sin(angle)
         player.x += xcomp*player.velocity
         player.y -= ycomp*player.velocity
-        
+
         #draw player
         rotatedShip = pygame.transform.rotate(ship, player.rotation)
         if player.y > WINDOW_HEIGHT: player.y -= WINDOW_HEIGHT
@@ -72,9 +74,10 @@ def main():
         if player.x > WINDOW_WIDTH: player.x -= WINDOW_WIDTH
         if player.x < 0: player.x += WINDOW_WIDTH
         win.fill(BLACK)
-        win.blit(rotatedShip, (player.x, player.y))
+        newship = rotatedShip.get_rect(center = ship.get_rect(topleft = (player.x, player.y)).center)
+        win.blit(rotatedShip, newship.topleft)
         pygame.display.update()
-
+        timer.tick(60)
 
     pygame.quit()
 

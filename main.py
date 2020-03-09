@@ -116,6 +116,10 @@ def drawProjectiles(projectiles, win):
     for each in projectiles:
         each.x += math.cos(math.radians(each.rotation))*each.velocity
         each.y -= math.sin(math.radians(each.rotation))*each.velocity
+        if each.y > WINDOW_HEIGHT: each.y -= WINDOW_HEIGHT
+        if each.y < 0: each.y += WINDOW_HEIGHT
+        if each.x > WINDOW_WIDTH: each.x -= WINDOW_WIDTH
+        if each.x < 0: each.x += WINDOW_WIDTH
         pygame.draw.rect(win, (255, 255, 255), (each.x-1, each.y-1, 3, 3))
         each.lifespan -= each.velocity
     for each in projectiles:

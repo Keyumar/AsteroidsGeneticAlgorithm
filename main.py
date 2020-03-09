@@ -4,12 +4,16 @@ import math
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
 BLACK = (0, 0, 0, 0)
+MAXSPEED = 10
+THRUST = 0.5
+DECAY = 0.1
 
 class Player:
     x = 100
     y = 100
     rotation = 0
-    velocity = 1
+    speed = 1
+    direction = 0
     lives = 3
     IMAGE = "player.png"
 
@@ -17,7 +21,8 @@ class Player:
         self.x = x
         self.y = y
         self.rotation = rotation
-        velocity = 1
+        speed = 1
+        direction = 0
 
 class Projectile:
     x = 100
@@ -55,7 +60,10 @@ def main():
     ship = pygame.image.load(player.IMAGE)
     ship = pygame.transform.rotate(ship, -90)
 
+    thrustvectors = []
+
     projectiles = []
+    firing = False
 
     timer =  pygame.time.Clock()
 
@@ -67,13 +75,15 @@ def main():
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
-            player.rotation += 15
+            player.rotation += 5
         if keys[pygame.K_RIGHT]:
-            player.rotation -= 15
+            player.rotation -= 5
         if keys[pygame.K_UP]:
-            if player.velocity <= 50: player.velocity += 5
-        if keys[pygame.K_DOWN]:
-            if player.velocity >= 6: player.velocity -= 5
+            thrustvectors.append([MAXSPEED, player.rotation])
+            #if player.speed <= MAXSPEED: player.speed += THRUST
+            #player.direction = (player.speed*player.direction + MAXSPEED*player.rotation)/(player.speed+MAXSPEED+1)
+        #if keys[pygame.K_DOWN]:
+            #if player.speed >= 1: player.speed -= 0.5
         if keys[pygame.K_SPACE]:
             projectiles.append(fireProjectile(player, ship))
 
@@ -85,12 +95,31 @@ def main():
             each.y -= math.sin(math.radians(each.rotation))*each.velocity
             pygame.draw.line(win, (255, 255, 255), (each.x, each.y), (each.x, each.y))
 
+        #calculate new ship direction
+        thrustlimit = 0
+        thrusttotal = 0
+        thrustdirection = 0
+        directions = []
+        directiontotal = 0
+        for each in thrustvectors:
+            thrusttotal += each[0]
+        for each in range(len(thrustvectors)):
+            directions.append(thrustvectors[each][1] * thrustvectors[each][0] / thrusttotal)
+            if thrustvectors[each][0] > thrustlimit: thrustlimit = thrustvectors[each][0]
+        for each in directions:
+            thrustdirection += each
+        if thrusttotal > 0: player.direction = thrustdirection
+        else: player.direction = player.rotation
+        player.speed = thrustlimit
+
+
+
         #calculate new ship position.
-        angle = math.radians(player.rotation)
+        angle = math.radians(player.direction)
         xcomp = math.cos(angle)
         ycomp = math.sin(angle)
-        player.x += xcomp*player.velocity
-        player.y -= ycomp*player.velocity
+        player.x += xcomp*player.speed
+        player.y -= ycomp*player.speed
 
         #draw player
         rotatedShip = pygame.transform.rotate(ship, player.rotation)
@@ -100,6 +129,14 @@ def main():
         if player.x < 0: player.x += WINDOW_WIDTH
         newship = rotatedShip.get_rect(center = ship.get_rect(topleft = (player.x, player.y)).center)
         win.blit(rotatedShip, newship.topleft)
+
+        #decay speed and prune vectors
+        for each in thrustvectors:
+            each[0] -= DECAY
+        for each in thrustvectors:
+            if each[0] < 0.5: thrustvectors.remove(each)
+        #if player.speed > 2*DECAY: player.speed -= DECAY
+        #if player.speed < 1: player.direction = player.rotation
 
         pygame.display.update()
         timer.tick(60)

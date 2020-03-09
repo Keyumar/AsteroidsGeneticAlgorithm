@@ -58,9 +58,10 @@ def main():
 
     pygame.display.set_caption("Asteroids Genetic Algorithm")
 
-    player = Player(100, 100, 0)
+    player = Player(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, 0)
     ship = pygame.image.load(player.IMAGE)
     ship = pygame.transform.rotate(ship, -90)
+    ship = pygame.transform.scale(ship, (20, 20))
 
     thrustvectors = []
 

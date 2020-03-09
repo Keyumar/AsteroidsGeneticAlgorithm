@@ -5,7 +5,7 @@ WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
 BLACK = (0, 0, 0, 0)
 MAXSPEED = 10
-THRUST = 0.5
+THRUST = 0.2
 DECAY = 0.1
 
 class Player:
@@ -29,12 +29,14 @@ class Projectile:
     y = 100
     rotation = 0
     velocity = 15
+    lifespan = WINDOW_WIDTH
 
     def __init__(self, x, y, rotation):
         self.x = x
         self.y = y
         self.rotation = rotation
         velocity = 15
+        lifespan = WINDOW_WIDTH
 
 class Asteroid:
     x = 50
@@ -79,8 +81,9 @@ def main():
         if keys[pygame.K_RIGHT]:
             player.rotation -= 5
         if keys[pygame.K_UP]:
-            thrustvectors.append([MAXSPEED, player.rotation])
-            #if player.speed <= MAXSPEED: player.speed += THRUST
+            if player.speed <= MAXSPEED: player.speed += THRUST
+            thrustvectors.append([player.speed, player.rotation])
+
         #if keys[pygame.K_DOWN]:
             #if player.speed >= 1: player.speed -= 0.5
         if keys[pygame.K_SPACE]:
@@ -113,7 +116,10 @@ def drawProjectiles(projectiles, win):
     for each in projectiles:
         each.x += math.cos(math.radians(each.rotation))*each.velocity
         each.y -= math.sin(math.radians(each.rotation))*each.velocity
-        pygame.draw.line(win, (255, 255, 255), (each.x, each.y), (each.x, each.y))
+        pygame.draw.rect(win, (255, 255, 255), (each.x-1, each.y-1, 3, 3))
+        each.lifespan -= each.velocity
+    for each in projectiles:
+        if each.lifespan <= 0: projectiles.remove(each)
 
 #calculate new ship direction
 def updateDirection(player, thrustvectors):
@@ -129,7 +135,8 @@ def updateDirection(player, thrustvectors):
         if thrustvectors[each][0] > thrustlimit: thrustlimit = thrustvectors[each][0]
     for each in directions:
         thrustdirection += each
-    if thrusttotal > 0: player.direction = thrustdirection
+    if thrusttotal > 0:
+        player.direction = thrustdirection
     else: player.direction = player.rotation
     player.speed = thrustlimit
 

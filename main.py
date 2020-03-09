@@ -84,21 +84,18 @@ def main():
         #if keys[pygame.K_DOWN]:
             #if player.speed >= 1: player.speed -= 0.5
         if keys[pygame.K_SPACE]:
-            projectiles.append(fireProjectile(player, ship))
+            if not firing: projectiles.append(fireProjectile(player, ship))
+            firing = True
+        if not keys[pygame.K_SPACE]:
+            firing = False
 
         win.fill(BLACK)
 
         drawProjectiles(projectiles, win)
-
         updateDirection(player, thrustvectors)
-
         updatePosition(player)
-
         drawPlayer(player, ship, win)
-
         decayThrust(thrustvectors)
-
-
 
         pygame.display.update()
         timer.tick(60)

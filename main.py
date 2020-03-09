@@ -28,13 +28,13 @@ class Projectile:
     x = 100
     y = 100
     rotation = 0
-    velocity = 5
+    velocity = 15
 
     def __init__(self, x, y, rotation):
         self.x = x
         self.y = y
         self.rotation = rotation
-        velocity = 5
+        velocity = 15
 
 class Asteroid:
     x = 50

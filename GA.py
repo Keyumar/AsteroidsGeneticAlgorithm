@@ -38,7 +38,7 @@ def mutate(x):
     return x
 #this is where the actual magic happens, all the functions above were helper functions for this
 # we set our mutation here and this is where we modify our population
-def genetic_queen(iterations, maxIterations, population, fitness):
+def genetic_algorithm(iterations, maxIterations, population, fitness):
     iterations += 1
     mutation_probability = 0.055
     new_population = []
@@ -69,7 +69,7 @@ def main():
     iterations = 0
     population = [random_chromosome(10) for _ in range(100)]
     while not maxFitness in [fitness(chrom) for chrom in population]:
-        population = genetic_queen(iterations, maxIterations, population, fitness)
+        population = genetic_algorithm(iterations, maxIterations, population, fitness)
         iterations += 1
     
 

@@ -2,22 +2,13 @@ import random
 import math
 import pygame
 import main 
-#changing a random queen position of a chromosome. 
+#TODO change this to be a random action perhaps? 
 def random_chromosome(size):
-    return [random.randint(1,nq) for _ in range(nq)]
-#calculate the fitness of a chromosome by judging the position of all its queens
+    return [random.randint(1,size) for _ in range(size)]
+#calculate the fitness of a chromosome 
 def fitness(chromosome):
-
-    #TODO replace with real function calls, this is mostly pseudocode
-    worth = 0
-    if(sensor() == incomingAsteroid):
-        updateDirection(player, thrustvectors)
-    if(sensor() == asteroid):
-        fireProjectile(player, ship)
-        worth += asteroidPoints
-    if(sensor() == collision):
-        worth -= 3
-    return int(maxFitness - worth)
+    #TODO not final!
+    return int(maxFitness - score())
             
 #our probability is just defined by the ratio of a chromosomes fitness compared to our maximum fitness threshold
 def probability(chromosome, fitness):

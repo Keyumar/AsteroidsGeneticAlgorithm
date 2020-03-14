@@ -12,7 +12,7 @@ def fitness(chromosome):
     worth = 0
     if(sensor() == incomingAsteroid):
         updateDirection(player, thrustvectors)
-    if(sensor() == projectile):
+    if(sensor() == asteroid):
         fireProjectile(player, ship)
         worth += asteroidPoints
     if(sensor() == collision):

@@ -186,6 +186,8 @@ def decayThrust(thrustvectors):
 
 def drawAsteroids(asteroids, asteroidImgs, win):
     for each in range(len(asteroidImgs)):
+        asteroids[each].x += math.cos(math.radians(asteroids[each].rotation))
+        asteroids[each].y -= math.sin(math.radians(asteroids[each].rotation))
         win.blit(asteroidImgs[each],( asteroids[each].x, asteroids[each].y))
 
 if __name__ == '__main__':

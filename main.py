@@ -10,6 +10,7 @@ MAXSPEED = 10
 THRUST = 0.2
 DECAY = 0.1
 BREAKPOINTS = 3
+DEATHPOINTS = -10
 
 class Player:
     x = 100
@@ -19,6 +20,8 @@ class Player:
     direction = 0
     lives = 3
     IMAGE = "player.png"
+    hit = False
+    respawning = False
 
     def __init__(self, x, y, rotation):
         self.x = x
@@ -64,6 +67,7 @@ def main():
 
     SCORE = 0
     font = pygame.font.Font('Vector_Battle.ttf', 32)
+    font.set_bold(True)
     show_score = font.render('SCORE: 0', True, WHITE, BLACK)
     scoreboard = show_score.get_rect()
     scoreboard.center = (100, 50)
@@ -78,9 +82,11 @@ def main():
     ship = pygame.transform.scale(ship, (20, 20))
 
     thrustvectors = []
-    
+
     projectiles = []
     firing = False
+
+    respawntime = 0
 
     timer =  pygame.time.Clock()
 
@@ -113,10 +119,21 @@ def main():
             LEVEL += 1
             asteroids = generateAsteroids(asteroids, LEVEL)
 
-        projectiles = detectColision(asteroids, projectiles)
+        SCORE += detectPlayerColision(asteroids, player)
+        projectiles = detectProjectileColision(asteroids, projectiles)
         SCORE += splitAsteroids(asteroids)
         show_score = font.render('SCORE: '+str(SCORE), True, WHITE, BLACK)
         win.blit(show_score, scoreboard)
+
+        if player.hit:
+            player.respawning = True
+            respawntime = pygame.time.get_ticks() + 3000
+            player.hit = False
+
+        if player.respawning and pygame.time.get_ticks() > respawntime:
+             player.respawning = False
+
+
         drawAsteroids(asteroids, win)
         drawProjectiles(projectiles, win)
         updateDirection(player, thrustvectors)
@@ -212,7 +229,18 @@ def drawAsteroids(asteroids, win):
         if each.x < 0: each.x += WINDOW_WIDTH
         win.blit(each.sprite,( each.x, each.y))
 
-def detectColision(asteroids, projectiles):
+def detectPlayerColision(asteroids, player):
+    if not player.hit and not player.respawning:
+        for asteroid in asteroids:
+            if player.x>= asteroid.x and player.y >= asteroid.y and player.x <= asteroid.x + 64 and player.y <= asteroid.y + 64:
+                player.hit = True
+                player.x = WINDOW_WIDTH/2
+                player.y = WINDOW_HEIGHT/2
+                return DEATHPOINTS
+    return 0
+
+
+def detectProjectileColision(asteroids, projectiles):
     for asteroid in asteroids:
         for bullet in projectiles:
             if bullet.x >= asteroid.x and bullet.y >= asteroid.y and bullet.x <= asteroid.x + 64 and bullet.y <= asteroid.y + 64:

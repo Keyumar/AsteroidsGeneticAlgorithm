@@ -11,6 +11,7 @@ THRUST = 0.2
 DECAY = 0.1
 BREAKPOINTS = [0, 100, 50, 20]
 DEATHPOINTS = -1000
+RESPAWNTIME = 6000
 
 class Player:
     x = 100
@@ -21,7 +22,7 @@ class Player:
     lives = 3
     IMAGE = "player.png"
     hit = False
-    respawning = False
+    respawning = RESPAWNTIME
 
     def __init__(self, x, y, rotation):
         self.x = x
@@ -126,12 +127,10 @@ def main():
         win.blit(show_score, scoreboard)
 
         if player.hit:
-            player.respawning = True
-            respawntime = pygame.time.get_ticks() + 3000
+            player.respawning = RESPAWNTIME
             player.hit = False
-
-        if player.respawning and pygame.time.get_ticks() > respawntime:
-             player.respawning = False
+        if player.respawning > 0:
+             player.respawning -= 60
 
         drawAsteroids(asteroids, win)
         drawProjectiles(projectiles, win)
@@ -200,7 +199,8 @@ def drawPlayer(player, ship, win):
     if player.x > WINDOW_WIDTH: player.x -= WINDOW_WIDTH
     if player.x < 0: player.x += WINDOW_WIDTH
     newship = rotatedShip.get_rect(center = ship.get_rect(topleft = (player.x, player.y)).center)
-    win.blit(rotatedShip, newship.topleft)
+    if player.respawning % 500 < 250:
+        win.blit(rotatedShip, newship.topleft)
 
 #decay speed and prune vectors
 def decayThrust(thrustvectors):

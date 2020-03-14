@@ -9,8 +9,8 @@ WHITE = (255, 255, 255)
 MAXSPEED = 10
 THRUST = 0.2
 DECAY = 0.1
-BREAKPOINTS = 3
-DEATHPOINTS = -10
+BREAKPOINTS = [0, 100, 50, 20]
+DEATHPOINTS = -1000
 
 class Player:
     x = 100
@@ -133,14 +133,12 @@ def main():
         if player.respawning and pygame.time.get_ticks() > respawntime:
              player.respawning = False
 
-
         drawAsteroids(asteroids, win)
         drawProjectiles(projectiles, win)
         updateDirection(player, thrustvectors)
         updatePosition(player)
         drawPlayer(player, ship, win)
         decayThrust(thrustvectors)
-
 
         pygame.display.update()
         timer.tick(60)
@@ -252,7 +250,7 @@ def splitAsteroids(asteroids):
     score = 0
     for each in asteroids:
         if each.dead == True:
-            score += BREAKPOINTS
+            score += BREAKPOINTS[each.scale]
             if each.scale > 1:
                 newAsteroid1 = Asteroid(each.x, each.y, random.random()*360)
                 newAsteroid2 = Asteroid(each.x, each.y, random.random()*360)

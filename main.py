@@ -188,6 +188,10 @@ def drawAsteroids(asteroids, asteroidImgs, win):
     for each in range(len(asteroidImgs)):
         asteroids[each].x += math.cos(math.radians(asteroids[each].rotation))
         asteroids[each].y -= math.sin(math.radians(asteroids[each].rotation))
+        if asteroids[each].y > WINDOW_HEIGHT: asteroids[each].y -= WINDOW_HEIGHT
+        if asteroids[each].y < 0: asteroids[each].y += WINDOW_HEIGHT
+        if asteroids[each].x > WINDOW_WIDTH: asteroids[each].x -= WINDOW_WIDTH
+        if asteroids[each].x < 0: asteroids[each].x += WINDOW_WIDTH
         win.blit(asteroidImgs[each],( asteroids[each].x, asteroids[each].y))
 
 if __name__ == '__main__':

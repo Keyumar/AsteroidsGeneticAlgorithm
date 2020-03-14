@@ -47,6 +47,7 @@ class Asteroid:
     velocity = 1
     IMAGE = "asteroid.png"
     scale = 3 #lower by 1 each time hit and split into more asteroids, if at 1, dies when hit
+    sprite = pygame.image.load(IMAGE)
 
     def __init__(self, x, y, rotation):
         self.x = x
@@ -61,14 +62,9 @@ def main():
 
     pygame.display.set_caption("Asteroids Genetic Algorithm")
 
+    LEVEL = 4
     asteroids = []
-    for each in range(4):
-        newasteroid = Asteroid(random.random()*WINDOW_WIDTH, random.random()*WINDOW_HEIGHT, random.random()*360)
-        asteroids.append(newasteroid)
-    asteroidImgs = []
-    for each in range(4):
-        newAsteroidImg = pygame.image.load(asteroids[each].IMAGE)
-        asteroidImgs.append(newAsteroidImg)
+    asteroids = generateAsteroids(asteroids, LEVEL)
 
     player = Player(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, 0)
     ship = pygame.image.load(player.IMAGE)
@@ -107,8 +103,11 @@ def main():
 
         win.fill(BLACK)
 
-        drawAsteroids(asteroids, asteroidImgs, win)
+        if len(asteroids) == 0:
+            LEVEL += 1
+            asteroids = generateAsteroids(asteroids, LEVEL)
 
+        drawAsteroids(asteroids, win)
         drawProjectiles(projectiles, win)
         updateDirection(player, thrustvectors)
         updatePosition(player)
@@ -184,15 +183,22 @@ def decayThrust(thrustvectors):
     for each in thrustvectors:
         if each[0] < 0.5: thrustvectors.remove(each)
 
-def drawAsteroids(asteroids, asteroidImgs, win):
-    for each in range(len(asteroidImgs)):
-        asteroids[each].x += math.cos(math.radians(asteroids[each].rotation))
-        asteroids[each].y -= math.sin(math.radians(asteroids[each].rotation))
-        if asteroids[each].y > WINDOW_HEIGHT: asteroids[each].y -= WINDOW_HEIGHT
-        if asteroids[each].y < 0: asteroids[each].y += WINDOW_HEIGHT
-        if asteroids[each].x > WINDOW_WIDTH: asteroids[each].x -= WINDOW_WIDTH
-        if asteroids[each].x < 0: asteroids[each].x += WINDOW_WIDTH
-        win.blit(asteroidImgs[each],( asteroids[each].x, asteroids[each].y))
+def generateAsteroids(asteroids, LEVEL):
+    for each in range(LEVEL):
+        newasteroid = Asteroid(random.random()*WINDOW_WIDTH, random.random()*WINDOW_HEIGHT, random.random()*360)
+        asteroids.append(newasteroid)
+        asteroids[each].sprite = pygame.image.load(asteroids[each].IMAGE)
+    return asteroids
+
+def drawAsteroids(asteroids, win):
+    for each in asteroids:
+        each.x += math.cos(math.radians(each.rotation))
+        each.y -= math.sin(math.radians(each.rotation))
+        if each.y > WINDOW_HEIGHT: each.y -= WINDOW_HEIGHT
+        if each.y < 0: each.y += WINDOW_HEIGHT
+        if each.x > WINDOW_WIDTH: each.x -= WINDOW_WIDTH
+        if each.x < 0: each.x += WINDOW_WIDTH
+        win.blit(each.sprite,( each.x, each.y))
 
 if __name__ == '__main__':
     main()

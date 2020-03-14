@@ -5,6 +5,7 @@ import random
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
 BLACK = (0, 0, 0, 0)
+WHITE = (255, 255, 255)
 MAXSPEED = 10
 THRUST = 0.2
 DECAY = 0.1
@@ -58,12 +59,14 @@ class Asteroid:
 
 def main():
     pygame.init()
-
     win = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-
     pygame.display.set_caption("Asteroids Genetic Algorithm")
 
     SCORE = 0
+    font = pygame.font.Font('Vector_Battle.ttf', 32)
+    show_score = font.render('SCORE: 0', True, WHITE, BLACK)
+    scoreboard = show_score.get_rect()
+    scoreboard.center = (100, 50)
 
     LEVEL = 4
     asteroids = []
@@ -75,7 +78,7 @@ def main():
     ship = pygame.transform.scale(ship, (20, 20))
 
     thrustvectors = []
-
+    
     projectiles = []
     firing = False
 
@@ -112,13 +115,15 @@ def main():
 
         projectiles = detectColision(asteroids, projectiles)
         SCORE += splitAsteroids(asteroids)
-        print(SCORE)
+        show_score = font.render('SCORE: '+str(SCORE), True, WHITE, BLACK)
+        win.blit(show_score, scoreboard)
         drawAsteroids(asteroids, win)
         drawProjectiles(projectiles, win)
         updateDirection(player, thrustvectors)
         updatePosition(player)
         drawPlayer(player, ship, win)
         decayThrust(thrustvectors)
+
 
         pygame.display.update()
         timer.tick(60)

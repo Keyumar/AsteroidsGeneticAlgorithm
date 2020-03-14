@@ -8,6 +8,7 @@ BLACK = (0, 0, 0, 0)
 MAXSPEED = 10
 THRUST = 0.2
 DECAY = 0.1
+BREAKPOINTS = 3
 
 class Player:
     x = 100
@@ -46,6 +47,8 @@ class Asteroid:
     velocity = 1
     IMAGE = "asteroid.png"
     scale = 3 #lower by 1 each time hit and split into more asteroids, if at 1, dies when hit
+    sprite = pygame.image.load(IMAGE)
+    dead = False
 
     def __init__(self, x, y, rotation):
         self.x = x
@@ -60,14 +63,11 @@ def main():
 
     pygame.display.set_caption("Asteroids Genetic Algorithm")
 
+    SCORE = 0
+
+    LEVEL = 4
     asteroids = []
-    for each in range(4):
-        newasteroid = Asteroid(random.random()*WINDOW_WIDTH, random.random()*WINDOW_HEIGHT, random.random()*360)
-        asteroids.append(newasteroid)
-    asteroidImgs = []
-    for each in range(4):
-        newAsteroidImg = pygame.image.load(asteroids[each].IMAGE)
-        asteroidImgs.append(newAsteroidImg)
+    asteroids = generateAsteroids(asteroids, LEVEL)
 
     player = Player(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, 0)
     ship = pygame.image.load(player.IMAGE)
@@ -96,12 +96,6 @@ def main():
             if player.speed <= MAXSPEED: player.speed += THRUST
             thrustvectors.append([player.speed, player.rotation])
 
-        for asteroid in asteroids:
-            for bullet in projectiles:
-                if bullet.x >= asteroid.x and bullet.y >= asteroid.y and bullet.x <= asteroid.x + 64 and bullet.y <= asteroid.y + 64:
-                    #delete
-                    print("test")
-        
         #if keys[pygame.K_DOWN]:
         #if player.speed >= 1: player.speed -= 0.5
         if keys[pygame.K_SPACE]:
@@ -112,8 +106,14 @@ def main():
 
         win.fill(BLACK)
 
-        drawAsteroids(asteroids, asteroidImgs, win)
+        if len(asteroids) == 0:
+            LEVEL += 1
+            asteroids = generateAsteroids(asteroids, LEVEL)
 
+        projectiles = detectColision(asteroids, projectiles)
+        SCORE += splitAsteroids(asteroids)
+        print(SCORE)
+        drawAsteroids(asteroids, win)
         drawProjectiles(projectiles, win)
         updateDirection(player, thrustvectors)
         updatePosition(player)
@@ -189,15 +189,50 @@ def decayThrust(thrustvectors):
     for each in thrustvectors:
         if each[0] < 0.5: thrustvectors.remove(each)
 
-def drawAsteroids(asteroids, asteroidImgs, win):
-    for each in range(len(asteroidImgs)):
-        asteroids[each].x += math.cos(math.radians(asteroids[each].rotation))
-        asteroids[each].y -= math.sin(math.radians(asteroids[each].rotation))
-        if asteroids[each].y > WINDOW_HEIGHT: asteroids[each].y -= WINDOW_HEIGHT
-        if asteroids[each].y < 0: asteroids[each].y += WINDOW_HEIGHT
-        if asteroids[each].x > WINDOW_WIDTH: asteroids[each].x -= WINDOW_WIDTH
-        if asteroids[each].x < 0: asteroids[each].x += WINDOW_WIDTH
-        win.blit(asteroidImgs[each],( asteroids[each].x, asteroids[each].y))
+def generateAsteroids(asteroids, LEVEL):
+    for each in range(LEVEL):
+        newasteroid = Asteroid(random.random()*WINDOW_WIDTH, random.random()*WINDOW_HEIGHT, random.random()*360)
+        asteroids.append(newasteroid)
+        asteroids[each].sprite = pygame.image.load(asteroids[each].IMAGE)
+        asteroids[each].sprite = pygame.transform.scale(asteroids[each].sprite, (90, 90))
+    return asteroids
+
+def drawAsteroids(asteroids, win):
+    for each in asteroids:
+        each.x += math.cos(math.radians(each.rotation))*each.velocity
+        each.y -= math.sin(math.radians(each.rotation))*each.velocity
+        if each.y > WINDOW_HEIGHT: each.y -= WINDOW_HEIGHT
+        if each.y < 0: each.y += WINDOW_HEIGHT
+        if each.x > WINDOW_WIDTH: each.x -= WINDOW_WIDTH
+        if each.x < 0: each.x += WINDOW_WIDTH
+        win.blit(each.sprite,( each.x, each.y))
+
+def detectColision(asteroids, projectiles):
+    for asteroid in asteroids:
+        for bullet in projectiles:
+            if bullet.x >= asteroid.x and bullet.y >= asteroid.y and bullet.x <= asteroid.x + 64 and bullet.y <= asteroid.y + 64:
+                asteroid.dead = True
+                projectiles.remove(bullet)
+    return projectiles
+
+def splitAsteroids(asteroids):
+    score = 0
+    for each in asteroids:
+        if each.dead == True:
+            score += BREAKPOINTS
+            if each.scale > 1:
+                newAsteroid1 = Asteroid(each.x, each.y, random.random()*360)
+                newAsteroid2 = Asteroid(each.x, each.y, random.random()*360)
+                newAsteroid1.scale = each.scale - 1
+                newAsteroid2.scale = each.scale - 1
+                newAsteroid1.velocity = each.velocity + 1
+                newAsteroid2.velocity = each.velocity + 1
+                newAsteroid1.sprite = pygame.transform.scale(newAsteroid1.sprite, (newAsteroid1.scale*30, newAsteroid1.scale*30))
+                newAsteroid2.sprite = pygame.transform.scale(newAsteroid2.sprite, (newAsteroid2.scale*30, newAsteroid2.scale*30))
+                asteroids.append(newAsteroid1)
+                asteroids.append(newAsteroid2)
+            asteroids.remove(each)
+    return score
 
 if __name__ == '__main__':
     main()

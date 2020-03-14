@@ -9,7 +9,6 @@ MAXSPEED = 10
 THRUST = 0.2
 DECAY = 0.1
 
-
 class Player:
     x = 100
     y = 100
@@ -93,8 +92,14 @@ def main():
             if player.speed <= MAXSPEED: player.speed += THRUST
             thrustvectors.append([player.speed, player.rotation])
 
+        for asteroid in asteroids:
+            for bullet in projectiles:
+                if bullet.x >= asteroid.x and bullet.y >= asteroid.y and bullet.x <= asteroid.x + 64 and bullet.y <= asteroid.y + 64:
+                    #delete
+                    print("test")
+        
         #if keys[pygame.K_DOWN]:
-            #if player.speed >= 1: player.speed -= 0.5
+        #if player.speed >= 1: player.speed -= 0.5
         if keys[pygame.K_SPACE]:
             if not firing: projectiles.append(fireProjectile(player, ship))
             firing = True

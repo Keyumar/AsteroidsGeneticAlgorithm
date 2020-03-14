@@ -62,6 +62,8 @@ def main():
 
     pygame.display.set_caption("Asteroids Genetic Algorithm")
 
+    SCORE = 0
+
     LEVEL = 4
     asteroids = []
     asteroids = generateAsteroids(asteroids, LEVEL)
@@ -195,8 +197,8 @@ def generateAsteroids(asteroids, LEVEL):
 
 def drawAsteroids(asteroids, win):
     for each in asteroids:
-        each.x += math.cos(math.radians(each.rotation))
-        each.y -= math.sin(math.radians(each.rotation))
+        each.x += math.cos(math.radians(each.rotation))*each.velocity
+        each.y -= math.sin(math.radians(each.rotation))*each.velocity
         if each.y > WINDOW_HEIGHT: each.y -= WINDOW_HEIGHT
         if each.y < 0: each.y += WINDOW_HEIGHT
         if each.x > WINDOW_WIDTH: each.x -= WINDOW_WIDTH
@@ -219,8 +221,8 @@ def splitAsteroids(asteroids):
                 newAsteroid2 = Asteroid(each.x, each.y, random.random()*360)
                 newAsteroid1.scale = each.scale - 1
                 newAsteroid2.scale = each.scale - 1
-                newAsteroid1.velocity += 1
-                newAsteroid2.velocity += 1
+                newAsteroid1.velocity = each.velocity + 1
+                newAsteroid2.velocity = each.velocity + 1
                 newAsteroid1.sprite = pygame.transform.scale(newAsteroid1.sprite, (newAsteroid1.scale*30, newAsteroid1.scale*30))
                 newAsteroid2.sprite = pygame.transform.scale(newAsteroid2.sprite, (newAsteroid2.scale*30, newAsteroid2.scale*30))
                 asteroids.append(newAsteroid1)

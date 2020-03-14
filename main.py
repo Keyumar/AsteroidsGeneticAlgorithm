@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
@@ -7,6 +8,7 @@ BLACK = (0, 0, 0, 0)
 MAXSPEED = 10
 THRUST = 0.2
 DECAY = 0.1
+
 
 class Player:
     x = 100
@@ -29,20 +31,21 @@ class Projectile:
     y = 100
     rotation = 0
     velocity = 15
-    lifespan = WINDOW_WIDTH
+    lifespan = WINDOW_WIDTH/2
 
     def __init__(self, x, y, rotation):
         self.x = x
         self.y = y
         self.rotation = rotation
         velocity = 15
-        lifespan = WINDOW_WIDTH
+        lifespan = WINDOW_WIDTH/2
 
 class Asteroid:
     x = 50
     y = 50
     rotation = 90.0
     velocity = 1
+    IMAGE = "asteroid.png"
     scale = 3 #lower by 1 each time hit and split into more asteroids, if at 1, dies when hit
 
     def __init__(self, x, y, rotation):
@@ -57,6 +60,15 @@ def main():
     win = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
     pygame.display.set_caption("Asteroids Genetic Algorithm")
+
+    asteroids = []
+    for each in range(4):
+        newasteroid = Asteroid(random.random()*WINDOW_WIDTH, random.random()*WINDOW_HEIGHT, random.random()*360)
+        asteroids.append(newasteroid)
+    asteroidImgs = []
+    for each in range(4):
+        newAsteroidImg = pygame.image.load(asteroids[each].IMAGE)
+        asteroidImgs.append(newAsteroidImg)
 
     player = Player(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, 0)
     ship = pygame.image.load(player.IMAGE)
@@ -94,6 +106,8 @@ def main():
             firing = False
 
         win.fill(BLACK)
+
+        drawAsteroids(asteroids, asteroidImgs, win)
 
         drawProjectiles(projectiles, win)
         updateDirection(player, thrustvectors)
@@ -169,6 +183,10 @@ def decayThrust(thrustvectors):
         each[0] -= DECAY
     for each in thrustvectors:
         if each[0] < 0.5: thrustvectors.remove(each)
+
+def drawAsteroids(asteroids, asteroidImgs, win):
+    for each in range(len(asteroidImgs)):
+        win.blit(asteroidImgs[each],( asteroids[each].x, asteroids[each].y))
 
 if __name__ == '__main__':
     main()

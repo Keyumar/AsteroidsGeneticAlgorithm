@@ -8,6 +8,7 @@ BLACK = (0, 0, 0, 0)
 MAXSPEED = 10
 THRUST = 0.2
 DECAY = 0.1
+BREAKPOINTS = 3
 
 class Player:
     x = 100
@@ -110,7 +111,8 @@ def main():
             asteroids = generateAsteroids(asteroids, LEVEL)
 
         projectiles = detectColision(asteroids, projectiles)
-        splitAsteroids(asteroids)
+        SCORE += splitAsteroids(asteroids)
+        print(SCORE)
         drawAsteroids(asteroids, win)
         drawProjectiles(projectiles, win)
         updateDirection(player, thrustvectors)
@@ -214,8 +216,10 @@ def detectColision(asteroids, projectiles):
     return projectiles
 
 def splitAsteroids(asteroids):
+    score = 0
     for each in asteroids:
         if each.dead == True:
+            score += BREAKPOINTS
             if each.scale > 1:
                 newAsteroid1 = Asteroid(each.x, each.y, random.random()*360)
                 newAsteroid2 = Asteroid(each.x, each.y, random.random()*360)
@@ -228,6 +232,7 @@ def splitAsteroids(asteroids):
                 asteroids.append(newAsteroid1)
                 asteroids.append(newAsteroid2)
             asteroids.remove(each)
+    return score
 
 if __name__ == '__main__':
     main()

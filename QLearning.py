@@ -28,11 +28,29 @@ def greedy_choice(state):
 
 def act(action, player):
     initscore = player.score
+    finalscore = initscore
     #execute given action
+    #TODO figure this stuff out
     if action == 'Left':
+        player.position = ((player.position + MOVESPEED) * FRAMES_PER_ACTION) * moveVector
+        updatePosition(player)
+        drawPlayer(player, ship, win)        
     if action == 'Right':
+        player.position = ((player.position + MOVESPEED) * FRAMES_PER_ACTION) * moveVector
+        updatePosition(player)
+        drawPlayer(player, ship, win)
     if action == 'Thrust':
+        player.position = ((player.position + MOVESPEED) * FRAMES_PER_ACTION) * moveVector
+        updatePosition(player)
+        drawPlayer(player,ship,win)
     if action == 'Shoot':
+        drawPlayer(player, ship,win)
+        fireProjectile(player, ship)
+        drawProjectiles(projectiles, win)
+        if(detectProjectileCollision(asteroids, projectiles)):
+            finalscore += asteroidValue
+        
+        
     #will need to wait for projectileLifespan to return reward
     #observe new score
     return finalscore - initscore

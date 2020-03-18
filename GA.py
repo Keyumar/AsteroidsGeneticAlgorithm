@@ -2,6 +2,7 @@ import random
 import math
 import pygame
 import main 
+import constant
 #TODO change this to be a random action perhaps? 
 def random_chromosome(size):
     return [random.randint(1,size) for _ in range(size)]
@@ -39,8 +40,6 @@ def mutate(x):
 #this is where the actual magic happens, all the functions above were helper functions for this
 # we set our mutation here and this is where we modify our population
 def genetic_algorithm(iterations, maxIterations, population, fitness):
-    iterations += 1
-    mutation_probability = 0.055
     new_population = []
     probabilities = [probability(n, fitness) for n in population]
     #after we find our probabilities for our nodes, then start to select their attributes to reproduce with
@@ -49,7 +48,7 @@ def genetic_algorithm(iterations, maxIterations, population, fitness):
         y = random_pick(population, probabilities)
         child = reproduce(x,y)
         #if our mutation is greater than our randomly generated number, mutate a part of the child
-        if random.random() < mutation_probability:
+        if random.random() < constant.mutation_probability:
             child = mutate(child)
         print_chromosome(child)
         #add this new child to the generation
@@ -65,11 +64,10 @@ def print_chromosome(chrom):
 def main():
      #these three variables are placeholders
     maxFitness = (timeStepCount *asteroidPoints * asteroidAmount)
-    maxIterations = 500
     iterations = 0
     population = [random_chromosome(10) for _ in range(100)]
     while not maxFitness in [fitness(chrom) for chrom in population]:
-        population = genetic_algorithm(iterations, maxIterations, population, fitness)
+        population = genetic_algorithm(iterations, constant.maxIterations, population, fitness)
         iterations += 1
     
 
